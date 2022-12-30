@@ -1,6 +1,3 @@
-# import download_zip.py from cnpj_project
-# import pytest
-
 import pytest
 from cnpj_project.download_zip import get_data, download_zip
 from pathlib import Path
