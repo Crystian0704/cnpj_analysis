@@ -39,6 +39,7 @@ def get_data():
 
 def download_zip(url):
     sema = asyncio.Semaphore(3)
+    DATA_DIR.rmdir()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     async def download(url, session):
