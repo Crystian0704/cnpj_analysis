@@ -21,17 +21,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
-        #active virtual environment
-        poetry shell
-    - name: Lint with blue
-      run: |
-        run blue .
+
     - name: Lint with isort
       run: |
-        run isort --check .
+        poetry run isort --check .
     - name: Lint with flake8
       run: |
-        run flake8 .
+        poetry run flake8 .
     - name: Test with pytest
       run: |
         run pytest
