@@ -1,13 +1,13 @@
 from pathlib import Path
 
-from cnpj_project.download_zip import download_zip, get_data
+from cnpj_project.download_zip import download_zip, get_link
 
 URL = 'https://dadosabertos.rfb.gov.br/CNPJ/'
 
 
-def test_get_data():
+def test_get_link():
 
-    url = get_data(URL)[0]
+    url = get_link(URL)[0]
 
     # assert list is not empty
     assert url != [], 'List is empty'

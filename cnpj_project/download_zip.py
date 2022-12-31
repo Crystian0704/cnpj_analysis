@@ -1,5 +1,6 @@
 from logging import INFO, basicConfig, getLogger
 from pathlib import Path
+from typing import List, Union
 
 import requests
 from bs4 import BeautifulSoup
@@ -18,12 +19,15 @@ basicConfig(
 logger = getLogger(__name__)
 
 
-def get_data(url: str) -> list:
+def get_link(url: str) -> Union[List[str], None]:
+
+    """Get the link to download the zip file."""
 
     try:
         request = requests.get(url)
     except requests.exceptions.ConnectionError:
         logger.error('Connection error')
+        
         return None
 
     soup = BeautifulSoup(request.content, 'html.parser')
@@ -39,24 +43,39 @@ def get_data(url: str) -> list:
     return download_link
 
 
-def download_zip(urls) -> None:
+def download_zip(download_link: List[str]) -> None:
 
-    for url in urls:
+    """Download the zip file."""
+
+    for link in download_link:
+
+        file_name = link.split('/')[-1]
+
+        logger.info(f'Downloading {file_name}')
+
         try:
-            request = requests.get(url)
-        except requests.exceptions.ConnectionError:
+            request = requests.get(link)
+        #if connection error or keyboard interrupt break the loop and remove all zip files in data/raw
+        except (requests.exceptions.ConnectionError, KeyboardInterrupt):
             logger.error('Connection error')
-            continue
-
-        file_name = url.split('/')[-1]
+            logger.info('Removing all zip files in data/raw')
+            for file in DATA_DIR.glob('*.zip'):
+                file.unlink()
+            break
 
         with open(DATA_DIR / file_name, 'wb') as f:
             f.write(request.content)
 
-        logger.info(f'Download {file_name} completed')
-
+        logger.info(f'Downloaded {file_name}')
 
 if __name__ == '__main__':
 
-    urls = get_data(URL)
-    download_zip(urls)
+
+    download_link = get_link(URL)
+
+    if download_link:
+        download_zip(download_link)
+
+    else:
+        logger.error('No link to download')
+
