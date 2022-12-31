@@ -1,66 +1,62 @@
-import asyncio
 from logging import INFO, basicConfig, getLogger
 from pathlib import Path
 
-import aiofiles
-import aiohttp
 import requests
 from bs4 import BeautifulSoup
 
-DATA_DIR = Path(__file__).parent.parent / "data" / "raw"
-LOG_DIR = Path(__file__).parent.parent / "logs"
+DATA_DIR = Path(__file__).parent.parent / 'data' / 'raw'
+LOG_DIR = Path(__file__).parent.parent / 'logs'
+URL = 'https://dadosabertos.rfb.gov.br/CNPJ/'
 
 # create log
 basicConfig(
-    filename=LOG_DIR / "cnpj.log",
+    filename=LOG_DIR / 'cnpj.log',
     level=INFO,
-    format="%(asctime)s : %(levelname)s : %(message)s",
+    format='%(asctime)s : %(levelname)s : %(message)s',
 )
 
+logger = getLogger(__name__)
 
-def get_data():
-    url = "https://dadosabertos.rfb.gov.br/CNPJ/"
+
+def get_data(url: str) -> list:
+
     try:
         request = requests.get(url)
-        soup = BeautifulSoup(request.content, "html.parser")
-        getLogger().info("Requisição feita com sucesso")
-    except:
-        getLogger().error("Erro na requisição")
-    
+    except requests.exceptions.ConnectionError:
+        logger.error('Connection error')
+        return None
+
+    soup = BeautifulSoup(request.content, 'html.parser')
+
     # find all link with content zip + url
+
+    find_a = soup.find_all('a', href=True)
+
     download_link = [
-        a.get("href") for a in soup.find_all("a") if a.get("href").find(".zip") > 0
+        f"{url}{a['href']}" for a in find_a if a['href'].endswith('.zip')
     ]
-    return [url + link for link in download_link]
+
+    return download_link
 
 
-# async downloading zip a list of urls using aiohttp and aiofiles
+def download_zip(urls) -> None:
+    
+        for url in urls:
+            try:
+                request = requests.get(url)
+            except requests.exceptions.ConnectionError:
+                logger.error('Connection error')
+                continue
+    
+            file_name = url.split('/')[-1]
+    
+            with open(DATA_DIR / file_name, 'wb') as f:
+                f.write(request.content)
+    
+            logger.info(f'Download {file_name} completed')
 
 
-def download_zip(url):
-    sema = asyncio.Semaphore(3)
-    DATA_DIR.rmdir()
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    async def download(url, session):
-        async with sema:
-            async with session.get(url) as response:
-                filename = url.split("/")[-1]
-                async with aiofiles.open(DATA_DIR / filename, "wb") as f:
-                    await f.write(await response.read())
-
-    async def main():
-        async with aiohttp.ClientSession() as session:
-            tasks = [asyncio.create_task(download(url, session)) for url in url]
-            await asyncio.gather(*tasks)
-
-    try:
-        asyncio.run(main())
-    except TimeoutError:
-        # remove raw dir
-        Path(DATA_DIR).rmdir()
-
-
-if __name__ == "__main__":
-    url = get_data()
-    download_zip(url)
+if __name__ == '__main__':
+    
+    urls = get_data(URL)
+    download_zip(urls)
