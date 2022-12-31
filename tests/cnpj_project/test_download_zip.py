@@ -1,13 +1,33 @@
-import pytest
-from cnpj_project.download_zip import get_data, download_zip
 from pathlib import Path
 
+from cnpj_project.download_zip import download_zip, get_data
+
+URL = 'https://dadosabertos.rfb.gov.br/CNPJ/'
+
+
 def test_get_data():
-    #assert list is not empty
-    assert get_data() != [], "List is empty"
-    #assert list is url
-    assert get_data()[0].startswith('http'), "List is not url"
-    #assert list end with zip
-    assert get_data()[0].endswith('.zip'), "List is not zip"
+
+    url = get_data(URL)[0]
+
+    # assert list is not empty
+    assert url != [], 'List is empty'
+    # assert list is url
+    assert url.startswith('http'), 'List is not url'
+    # assert list end with zip
+    assert url.endswith('.zip'), 'List is not zip'
 
 
+def test_download_zip():
+
+    url = URL + 'Cnaes.zip'
+    download_zip([url])
+
+    # path data/raw
+
+    path = Path(__file__).resolve().parents[2] / 'data' / 'raw'
+    # test cnaes.zip is in path
+
+    assert (path / 'Cnaes.zip').exists(), 'File not downloaded'
+
+    # remove file
+    (path / 'Cnaes.zip').unlink()

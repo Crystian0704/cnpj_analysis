@@ -40,23 +40,23 @@ def get_data(url: str) -> list:
 
 
 def download_zip(urls) -> None:
-    
-        for url in urls:
-            try:
-                request = requests.get(url)
-            except requests.exceptions.ConnectionError:
-                logger.error('Connection error')
-                continue
-    
-            file_name = url.split('/')[-1]
-    
-            with open(DATA_DIR / file_name, 'wb') as f:
-                f.write(request.content)
-    
-            logger.info(f'Download {file_name} completed')
+
+    for url in urls:
+        try:
+            request = requests.get(url)
+        except requests.exceptions.ConnectionError:
+            logger.error('Connection error')
+            continue
+
+        file_name = url.split('/')[-1]
+
+        with open(DATA_DIR / file_name, 'wb') as f:
+            f.write(request.content)
+
+        logger.info(f'Download {file_name} completed')
 
 
 if __name__ == '__main__':
-    
+
     urls = get_data(URL)
     download_zip(urls)
