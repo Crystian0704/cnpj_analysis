@@ -30,4 +30,4 @@ jobs:
         poetry run flake8 .
     - name: Test with pytest
       run: |
-        run pytest .
+        poetry run pytest 
