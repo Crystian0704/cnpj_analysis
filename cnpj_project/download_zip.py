@@ -21,7 +21,12 @@ logger = getLogger(__name__)
 
 def get_link(url: str) -> Union[List[str], None]:
 
-    """Get the link to download the zip file."""
+    """Get the link to download the zip file.
+
+    :param url: url to get the link
+    :return: list of download links
+    
+    """
 
     try:
         request = requests.get(url)
@@ -45,7 +50,12 @@ def get_link(url: str) -> Union[List[str], None]:
 
 def download_zip(download_link: List[str]) -> None:
 
-    """Download the zip file."""
+    """Download the zip file.
+    
+    :param download_link: list of download links
+    :return: None
+
+    """
 
     for link in download_link:
 
