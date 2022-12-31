@@ -52,10 +52,9 @@ def download_zip(download_link: List[str]) -> None:
         file_name = link.split('/')[-1]
 
         logger.info(f'Downloading {file_name}')
-
+        #if error remove file
         try:
             request = requests.get(link)
-        #if connection error or keyboard interrupt break the loop and remove all zip files in data/raw
         except (requests.exceptions.ConnectionError, KeyboardInterrupt):
             logger.error('Connection error')
             logger.info('Removing all zip files in data/raw')
