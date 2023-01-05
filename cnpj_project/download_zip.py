@@ -1,15 +1,16 @@
 from logging import INFO, basicConfig, getLogger
 from pathlib import Path
-from typing import List, Union
+from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
 
+# ajusta os caminhos das pastas
 DATA_DIR = Path(__file__).parent.parent / 'data' / 'raw'
 LOG_DIR = Path(__file__).parent.parent / 'logs'
 URL = 'https://dadosabertos.rfb.gov.br/CNPJ/'
 
-# create log
+# cria a configuração do log e o logger
 basicConfig(
     filename=LOG_DIR / 'cnpj.log',
     level=INFO,
@@ -19,26 +20,25 @@ basicConfig(
 logger = getLogger(__name__)
 
 
-def get_link(url: str) -> Union[List[str], None]:
+def get_link(url: str) -> Optional[List[str]]:
 
-    """Get the link to download the zip file.
+    """Obtém o link para baixar o arquivo zip.
 
-    :param url: url to get the link
-    :return: list of download links
+    :param url: url para obter o link dos dados abertos do governo  
+    :return: lista de links de download ou None em caso de falha na conexão
     
     """
 
     try:
         request = requests.get(url)
     except requests.exceptions.ConnectionError:
-        logger.error('Connection error')
+        logger.error('Erro de conexão')
         
         return None
 
     soup = BeautifulSoup(request.content, 'html.parser')
 
-    # find all link with content zip + url
-
+    # encontra todos os links com o conteúdo zip + url
     find_a = soup.find_all('a', href=True)
 
     download_link = [
@@ -50,9 +50,9 @@ def get_link(url: str) -> Union[List[str], None]:
 
 def download_zip(download_link: List[str]) -> None:
 
-    """Download the zip file.
+    """Baixa o arquivo zip.
     
-    :param download_link: list of download links
+    :param download_link: lista de links de download
     :return: None
 
     """
@@ -61,21 +61,22 @@ def download_zip(download_link: List[str]) -> None:
 
         file_name = link.split('/')[-1]
 
-        logger.info(f'Downloading {file_name}')
-        #if error remove file
+        logger.info(f'Baixando {file_name}')
+        
         try:
             request = requests.get(link)
         except (requests.exceptions.ConnectionError, KeyboardInterrupt):
-            logger.error('Connection error')
-            logger.info('Removing all zip files in data/raw')
+            logger.error('Erro de conexão')
+            logger.info('Removendo todos os arquivos zip em data/raw')
             for file in DATA_DIR.glob('*.zip'):
+                # se houver erro, remove o arquivo
                 file.unlink()
             break
 
         with open(DATA_DIR / file_name, 'wb') as f:
             f.write(request.content)
 
-        logger.info(f'Downloaded {file_name}')
+    logger.info(f'Baixado com sucesso')
 
 if __name__ == '__main__':
 
@@ -86,5 +87,5 @@ if __name__ == '__main__':
         download_zip(download_link)
 
     else:
-        logger.error('No link to download')
+        logger.error('Nenhum link para baixar encontrado!')
 
