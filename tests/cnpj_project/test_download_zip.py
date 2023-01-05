@@ -7,27 +7,40 @@ URL = 'https://dadosabertos.rfb.gov.br/CNPJ/'
 
 def test_get_link():
 
-    url = get_link(URL)[0]
+    """Testa se a lista de links não está vazia e se começa com http e termina com zip.
 
-    # assert list is not empty
+    params: None
+    return: None
+
+    """
+
+    url = get_link(URL)[0]   # type: ignore
+
+    # garante que a lista não está vazia
     assert url != [], 'List is empty'
-    # assert list is url
+    # garante que a lista começa com http
     assert url.startswith('http'), 'List is not url'
-    # assert list end with zip
+    # garante que a lista termina com zip
     assert url.endswith('.zip'), 'List is not zip'
 
 
 def test_download_zip():
 
+    """Testa se o arquivo foi baixado e se foi removido.
+
+    params: None
+    return: None
+
+    """
+
     url = URL + 'Cnaes.zip'
     download_zip([url])
 
-    # path data/raw
-
+    # ajusta caminho data/raw
     path = Path(__file__).resolve().parents[2] / 'data' / 'raw'
-    # test cnaes.zip is in path
 
+    # garante que o arquivo foi baixado
     assert (path / 'Cnaes.zip').exists(), 'File not downloaded'
 
-    # remove file
+    # remove o arquivo baixado
     (path / 'Cnaes.zip').unlink()
