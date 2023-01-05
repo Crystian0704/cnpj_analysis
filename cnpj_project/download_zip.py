@@ -21,14 +21,14 @@ logger = getLogger(__name__)
 
 
 def get_link(url: str) -> Optional[List[str]]:
-
     """Obtém o link para baixar o arquivo zip.
 
-    :param url: url para obter o link dos dados abertos do governo
-    :return: lista de links de download ou None em caso de falha na conexão
+    Args:
+        url (str): url para obter o link
 
+    Returns:
+        list: lista de links de download ou None em caso de falha na conexão
     """
-
     try:
         request = requests.get(url)
     except requests.exceptions.ConnectionError:
@@ -49,14 +49,14 @@ def get_link(url: str) -> Optional[List[str]]:
 
 
 def download_zip(download_link: List[str]) -> None:
-
     """Baixa o arquivo zip.
 
-    :param download_link: lista de links de download
-    :return: None
+    Args:
+        download_link (list): lista de links de download
 
+    Returns:
+        None
     """
-
     for link in download_link:
 
         file_name = link.split('/')[-1]
