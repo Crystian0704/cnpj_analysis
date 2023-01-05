@@ -24,16 +24,16 @@ def get_link(url: str) -> Optional[List[str]]:
 
     """Obtém o link para baixar o arquivo zip.
 
-    :param url: url para obter o link dos dados abertos do governo  
+    :param url: url para obter o link dos dados abertos do governo
     :return: lista de links de download ou None em caso de falha na conexão
-    
+
     """
 
     try:
         request = requests.get(url)
     except requests.exceptions.ConnectionError:
         logger.error('Erro de conexão')
-        
+
         return None
 
     soup = BeautifulSoup(request.content, 'html.parser')
@@ -51,7 +51,7 @@ def get_link(url: str) -> Optional[List[str]]:
 def download_zip(download_link: List[str]) -> None:
 
     """Baixa o arquivo zip.
-    
+
     :param download_link: lista de links de download
     :return: None
 
@@ -62,7 +62,7 @@ def download_zip(download_link: List[str]) -> None:
         file_name = link.split('/')[-1]
 
         logger.info(f'Baixando {file_name}')
-        
+
         try:
             request = requests.get(link)
         except (requests.exceptions.ConnectionError, KeyboardInterrupt):
@@ -76,10 +76,8 @@ def download_zip(download_link: List[str]) -> None:
         with open(DATA_DIR / file_name, 'wb') as f:
             f.write(request.content)
 
-    logger.info(f'Baixado com sucesso')
 
 if __name__ == '__main__':
-
 
     download_link = get_link(URL)
 
@@ -88,4 +86,3 @@ if __name__ == '__main__':
 
     else:
         logger.error('Nenhum link para baixar encontrado!')
-
