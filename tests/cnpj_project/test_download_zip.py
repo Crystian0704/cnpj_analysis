@@ -7,7 +7,7 @@ URL = 'https://dadosabertos.rfb.gov.br/CNPJ/'
 
 def test_get_link():
 
-    """Testa se a lista de links não está vazia e se começa com http e termina com zip.
+    """Testa se não está vazia e se começa com http e termina com zip.
 
     params: None
     return: None
