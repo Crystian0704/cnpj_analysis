@@ -3,7 +3,7 @@
 
 ## 1. Aquisição dos dados
 
-Este código tem como objetivo baixar um arquivo zip com os dados de CNPJ disponibilizados pelo governo brasileiro na página https://dadosabertos.rfb.gov.br/CNPJ/.
+Este código tem como objetivo baixar arquivos zip com os dados de CNPJ disponibilizados pelo governo brasileiro na página https://dadosabertos.rfb.gov.br/CNPJ/.
 
 Ele possui as seguintes funções:
 
