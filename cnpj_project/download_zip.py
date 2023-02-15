@@ -1,3 +1,5 @@
+"""Baixa o arquivo zip do site da Receita Federal."""
+
 from logging import INFO, basicConfig, getLogger
 from pathlib import Path
 from typing import List, Optional
@@ -30,7 +32,7 @@ def get_link(url: str) -> Optional[List[str]]:
         list: lista de links de download ou None em caso de falha na conexão
     """
     try:
-        request = requests.get(url)
+        request = requests.get(url, timeout=5)
     except requests.exceptions.ConnectionError:
         logger.error('Erro de conexão')
 
@@ -60,11 +62,11 @@ def download_zip(download_link: List[str]) -> None:
     for link in download_link:
 
         file_name = link.split('/')[-1]
-
-        logger.info(f'Baixando {file_name}')
+        # Use lazy % formatting in logging functions
+        logger.info('Baixando arquivo %s', file_name)
 
         try:
-            request = requests.get(link)
+            request = requests.get(link, timeout=5)
         except (requests.exceptions.ConnectionError, KeyboardInterrupt):
             logger.error('Erro de conexão')
             logger.info('Removendo todos os arquivos zip em data/raw')
@@ -73,16 +75,16 @@ def download_zip(download_link: List[str]) -> None:
                 file.unlink()
             break
 
-        with open(DATA_DIR / file_name, 'wb') as f:
-            f.write(request.content)
+        with open(DATA_DIR / file_name, 'wb') as filename:
+            filename.write(request.content)
 
 
 if __name__ == '__main__':
 
-    download_link = get_link(URL)
+    download = get_link(URL)
 
-    if download_link:
-        download_zip(download_link)
+    if download:
+        download_zip(download)
 
     else:
         logger.error('Nenhum link para baixar encontrado!')
