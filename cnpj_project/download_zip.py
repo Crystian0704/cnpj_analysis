@@ -1,4 +1,4 @@
-"""Baixa o arquivo zip do site da Receita Federal."""
+"""Baixa o arquivo zip com informações de CNPJ."""
 
 from logging import INFO, basicConfig, getLogger
 from pathlib import Path
